@@ -1,36 +1,72 @@
-# FILM!
+# FILM! — модульный API-сервис
 
-## Установка
+Backend проекта Film! реализован на Nest.js. Сервис предоставляет API афиши кинотеатра, расписание сеансов и бронирование билетов. Данные фильмов и занятых мест хранятся в MongoDB через Mongoose; для автоматических e2e-проверок предусмотрен in-memory репозиторий с тем же контрактом.
 
-### MongoDB
+## Структура backend
 
-Установите MongoDB скачав дистрибутив с официального сайта или с помощью пакетного менеджера вашей ОС. Также можно воспользоваться Docker (см. ветку `feat/docker`.
+- `src/films` — контроллер, сервис и DTO фильмов и расписания;
+- `src/order` — контроллер, сервис и DTO бронирования;
+- `src/repository` — интерфейс репозитория, MongoDB- и in-memory-реализации, Mongoose-схема;
+- `public/content/afisha` — статические изображения афиши;
+- `test/mongodb_initial_stub.json` — исходные данные для наполнения MongoDB.
 
-Выполните скрипт `test/mongodb_initial_stub.js` в консоли `mongo`.
+## API
 
-### Бэкенд
+- `GET /api/afisha/films` — список фильмов;
+- `GET /api/afisha/films/:id/schedule` — расписание выбранного фильма;
+- `POST /api/afisha/order` — бронирование одного или нескольких билетов;
+- `GET /content/afisha/*` — статический контент.
 
-Перейдите в папку с исходным кодом бэкенда
+При бронировании место хранится в `taken` в формате `row:seat`. Повторное бронирование уже занятого места завершается ошибкой `400`.
 
-`cd backend`
+## Переменные окружения
 
-Установите зависимости (точно такие же, как в package-lock.json) помощью команд
+Создайте `backend/.env` на основе `backend/.env.example`:
 
-`npm ci` или `yarn install --frozen-lockfile`
+```env
+PORT=3000
+DATABASE_DRIVER=mongodb
+DATABASE_URL=mongodb://127.0.0.1:27017/prac
+DEBUG=*
+```
 
-Создайте `.env` файл из примера `.env.example`, в нём укажите:
+`DATABASE_DRIVER=mongodb` включает MongoDB-репозиторий. Значение `inmemory` используется для локальных автоматических проверок без подключения к MongoDB.
 
-* `DATABASE_DRIVER` - тип драйвера СУБД - в нашем случае это `mongodb` 
-* `DATABASE_URL` - адрес СУБД MongoDB, например `mongodb://127.0.0.1:27017/practicum`.  
+## MongoDB
 
-MongoDB должна быть установлена и запущена.
+1. Запустите MongoDB.
+2. Создайте базу, указанную в `DATABASE_URL`.
+3. Импортируйте `backend/test/mongodb_initial_stub.json` в коллекцию `films` через MongoDB Compass (`Add Data` → `Import JSON or CSV file`).
 
-Запустите бэкенд:
+## Запуск backend
 
-`npm start:debug`
+```bash
+cd backend
+npm ci
+npm run start:dev
+```
 
-Для проверки отправьте тестовый запрос с помощью Postman или `curl`.
+По умолчанию сервер доступен на `http://localhost:3000`.
 
+## Проверки
 
+```bash
+cd backend
+npm run lint
+npm run build
+npm test -- --runInBand --passWithNoTests
+npm run test:e2e -- --runInBand
+```
 
+E2E-тесты проверяют получение списка фильмов, расписание, успешное бронирование и запрет повторного бронирования одного места.
 
+## Frontend
+
+Настройки frontend находятся в `frontend/.env.example`:
+
+```env
+VITE_API_URL=http://localhost:3000/api/afisha
+VITE_CDN_URL=http://localhost:3000/content/afisha
+```
+
+После настройки переменных окружения frontend можно запустить стандартной командой проекта.
