@@ -1,2 +1,5 @@
 node_modules
 .idea
+.env
+.mosya-audit/
+MOSYA-DEPLOY-*.ps1

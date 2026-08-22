@@ -14,7 +14,11 @@ import { RepositoryModule } from './repository/repository.module';
       cache: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: path.join(process.cwd(), 'public'),
+      rootPath: path.join(process.cwd(), 'public', 'content', 'afisha'),
+      serveRoot: '/content/afisha',
+      serveStaticOptions: {
+        index: 'bg1s.jpg',
+      },
     }),
     RepositoryModule,
     FilmsModule,

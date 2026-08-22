@@ -1,6 +1,8 @@
 export interface AppConfigDatabase {
   driver: string;
   url: string;
+  username: string;
+  password: string;
 }
 
 export interface AppConfig {
@@ -13,8 +15,10 @@ export const configProvider = {
   useFactory: (): AppConfig => ({
     port: Number(process.env.PORT) || 3000,
     database: {
-      driver: process.env.DATABASE_DRIVER || 'inmemory',
+      driver: process.env.DATABASE_DRIVER || 'postgres',
       url: process.env.DATABASE_URL || '',
+      username: process.env.DATABASE_USERNAME || '',
+      password: process.env.DATABASE_PASSWORD || '',
     },
   }),
 };

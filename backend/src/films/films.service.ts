@@ -49,6 +49,7 @@ export class FilmsService {
       title: film.title,
       about: film.about,
       description: film.description,
+      schedule: film.schedule.map((session) => this.toScheduleDto(session)),
     };
   }
 
